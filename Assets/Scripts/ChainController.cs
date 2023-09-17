@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ChainController : MonoBehaviour
@@ -7,13 +5,12 @@ public class ChainController : MonoBehaviour
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private float _chainSpeed = 2f;
     public static bool IsFired;
-    // Start is called before the first frame update
+
     void Start()
     {
         IsFired = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))

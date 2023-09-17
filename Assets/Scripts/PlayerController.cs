@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,7 +6,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D _playerRigidbody;
     private float _movement;
 
-    // Update is called once per frame
     void Update()
     {
         _movement = Input.GetAxisRaw("Horizontal") * _movementSpeed;
@@ -17,5 +14,14 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         _playerRigidbody.MovePosition(_playerRigidbody.position + new Vector2(_movement * Time.fixedDeltaTime, 0f));
+    }
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ball"))
+        {
+            Debug.Log("Player has been hit! Lose a life!");
+            GameManager.Instance.LoseLife();
+        }
     }
 }

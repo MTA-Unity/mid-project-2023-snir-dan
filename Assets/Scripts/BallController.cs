@@ -4,41 +4,42 @@ public class BallController : MonoBehaviour
 {
     [SerializeField] private GameObject _ballPrefab;
     private readonly float _smallestBallSize = 1f;
-
     private readonly Vector2 _splitForce = new Vector2(4f, 4f);
-
     [SerializeField] private Vector2 _startForce;
     [SerializeField] private Rigidbody2D _ballRigidbody;
-    public float BallSize { get { return transform.localScale.x; } }
+    public int ScoreValue { get; private set; } = 10;
 
     void Start()
     {
+        GameManager.Instance.OnBallSpawned();
         _ballRigidbody.AddForce(_startForce, ForceMode2D.Impulse);
     }
 
-    public void Split()
+    void OnDestroy()
     {
-        if (BallSize > _smallestBallSize)
+        GameManager.Instance.OnBallDestroyed();
+    }
+
+    public void Pop()
+    {
+        float ballSize = transform.localScale.x;
+        if (ballSize > _smallestBallSize)
         {
-            var rightBall = Instantiate(_ballPrefab, _ballRigidbody.position + Vector2.right / 4f, Quaternion.identity);
-            var leftBall = Instantiate(_ballPrefab, _ballRigidbody.position + Vector2.left / 4f, Quaternion.identity);
+            GameObject rightBall = Instantiate(_ballPrefab, _ballRigidbody.position + Vector2.right / 4f, Quaternion.identity);
+            GameObject leftBall = Instantiate(_ballPrefab, _ballRigidbody.position + Vector2.left / 4f, Quaternion.identity);
 
-            rightBall.transform.localScale = new Vector3(BallSize - 1, BallSize - 1, 1f);
-            leftBall.transform.localScale = new Vector3(BallSize - 1, BallSize - 1, 1f);
+            Vector3 childScale = new Vector3(ballSize - 1, ballSize - 1, 1f);
+            rightBall.transform.localScale = childScale;
+            leftBall.transform.localScale = childScale;
             
-            rightBall.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
-            leftBall.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
+            Color ballColor = GetComponent<SpriteRenderer>().color;
+            rightBall.GetComponent<SpriteRenderer>().color = ballColor;
+            leftBall.GetComponent<SpriteRenderer>().color = ballColor;
 
-            rightBall.GetComponent<BallController>().SetStartForce(_splitForce);
-            leftBall.GetComponent<BallController>().SetStartForce(_splitForce * new Vector2(-1, 1));
-
+            rightBall.GetComponent<BallController>()._startForce = _splitForce;
+            leftBall.GetComponent<BallController>()._startForce = _splitForce * new Vector2(-1, 1);
         }
 
         Destroy(gameObject);
-    }
-
-    public void SetStartForce(Vector2 force)
-    {
-        _startForce = force;
     }
 }

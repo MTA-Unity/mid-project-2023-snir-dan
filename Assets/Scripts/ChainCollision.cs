@@ -8,24 +8,9 @@ public class ChainCollision : MonoBehaviour
 
         if (other.CompareTag("Ball"))
         {
-            other.GetComponent<BallController>().Split();
+            BallController ballController = other.GetComponent<BallController>();
+            ballController.Pop();
+            GameManager.Instance.AddScore(ballController.ScoreValue);
         }
-        
-        // if (other.tag.Contains("Ball") && !_isColliding)
-        // {
-        //     Debug.Log("A ball has been hit");
-        //     _isColliding = true;
-        //     ScoreManager.Instance.AddBallHitScore(other.tag);
-
-        //     // Check for winning condition - One ball in scene without nextBall
-        //     var ball = other.GetComponent<Ball>();
-        //     bool hasWon = GameManager.Instance.HasWonLevel(ball.HasNextBall());
-            
-        //     ball.Split();
-        //     if (hasWon)
-        //     {
-        //         GameManager.Instance.ClearLevelWon();
-        //     }
-        // }
     }
 }
