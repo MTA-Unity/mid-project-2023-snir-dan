@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonController : MonoBehaviour
+public class MainMenuController : MonoBehaviour
 {
-
     public void OnPlayGameButtonClick()
     {
         Debug.Log("PlayGame Clicked");
+        GameManager.Instance.StartNewGame();
     }
 
     public void OnHighScoreButtonClick()
@@ -18,6 +16,7 @@ public class ButtonController : MonoBehaviour
     public void OnExitButtonClick()
     {
         Debug.Log("Exit Clicked");
+        GameManager.Instance.QuitGame();
     }
     
 }
