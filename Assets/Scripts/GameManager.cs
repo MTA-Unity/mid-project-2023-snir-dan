@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,13 @@ public class GameManager : MonoBehaviour
     private bool _isLevelActive = false;
     private int _numBallsInScene;
     private readonly int TimerScoreBonusFactor = 10;
+
+    public event Action OnGameOver;
+    public void GameOver()
+    {
+        Debug.Log("Game over");
+        OnGameOver?.Invoke();
+    }
 
     public static GameManager Instance;
     void Awake()
@@ -85,8 +93,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Lives: " + Lives);
         if (Lives <= 0)
         {
-            // Game Over
-            Debug.Log("Game Over");
+            GameOver();
         }
         else
         {
@@ -147,12 +154,17 @@ public class GameManager : MonoBehaviour
 
     public void QuitGame()
     {
-        // TODO: Are you sure?
         Debug.Log("Game closed");
-        // #if UNITY_EDITOR
-        //     UnityEditor.EditorApplication.isPlaying = false;
-        // #else
-        //     Application.Quit();
-        // #endif
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
+
+    public void LoadMainMenu()
+    {
+        Debug.Log("Loading main menu");
+        SceneManager.LoadScene("MainMenu");
     }
 }
