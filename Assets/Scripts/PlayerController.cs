@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ball"))
         {
-            Debug.Log("Player has been hit! Lose a life!");
             GameManager.Instance.LoseLife();
         }
     }

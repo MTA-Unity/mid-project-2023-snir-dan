@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -11,16 +11,23 @@ public class GameManager : MonoBehaviour
     public float RemainingLevelTime { get; private set; }
     [SerializeField] private int numberOfLevels = 3;
     public int Level { get; private set; }
-    private bool _isLevelActive = false;
+    public bool IsLevelActive { get; set; } = false;
     private int _numBallsInScene;
     private readonly int TimerScoreBonusFactor = 10;
-
-    public event Action OnGameOver;
-    public void GameOver()
+    public int HighScore
     {
-        Debug.Log("Game over");
-        OnGameOver?.Invoke();
+        get
+        {
+            return PlayerPrefs.GetInt("HighScore", 0);
+        }
+        private set
+        {
+            PlayerPrefs.SetInt("HighScore", value);
+        }
     }
+
+    public UnityEvent OnGameComplete = new UnityEvent();
+    public UnityEvent OnGameOver = new UnityEvent();
 
     public static GameManager Instance;
     void Awake()
@@ -38,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (!_isLevelActive)
+        if (!IsLevelActive)
         {
             return;
         }
@@ -54,18 +61,35 @@ public class GameManager : MonoBehaviour
         {
             levelComplete();
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+    public void GameComplete()
+    {
+        Debug.Log("Game complete");
+        if (Score > HighScore)
         {
-            QuitGame();
+            HighScore = Score;
         }
+
+        OnGameComplete?.Invoke();
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("Game over");
+        if (Score > HighScore)
+        {
+            HighScore = Score;
+        }
+
+        OnGameOver?.Invoke();
     }
 
     private void levelComplete()
     {
         Debug.Log("Level complete");
 
-        _isLevelActive = false;
+        IsLevelActive = false;
         AddScore((int)RemainingLevelTime * TimerScoreBonusFactor);
 
         if (Level < numberOfLevels)
@@ -74,8 +98,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Game complete");
-            // Game complete
+            GameComplete();
         }
     }
 
@@ -98,16 +121,17 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.Log("Resetting level");
-            // Reset level
+            // load the current level again to reset it
             loadLevel();
         }
     }
 
     private void resetGame()
     {
+        Debug.Log("Resetting game");
         Score = 0;
         Lives = _startingLives;
-        _isLevelActive = false;
+        IsLevelActive = false;
     }
 
     public void StartNewGame()
@@ -123,12 +147,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Loading level " + Level);
         RemainingLevelTime = _levelTimer;
         SceneManager.LoadScene("Level" + Level);
-        Invoke(nameof(setIsLevelActive), 2f);
-    }
-
-    private void setIsLevelActive()
-    {
-        _isLevelActive = true;
     }
 
     private void LoadNextLevel()
@@ -140,7 +158,6 @@ public class GameManager : MonoBehaviour
     public void OnBallSpawned()
     {
         _numBallsInScene++;
-        Debug.Log("OnBallSpawned: Number of balls in scene: " + _numBallsInScene);
     }
 
     public void OnBallDestroyed()
@@ -149,22 +166,22 @@ public class GameManager : MonoBehaviour
         {
             _numBallsInScene--;
         }
-        Debug.Log("OnBallDestroyed: Number of balls in scene: " + _numBallsInScene);
     }
 
     public void QuitGame()
     {
         Debug.Log("Game closed");
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
             Application.Quit();
-        #endif
+#endif
     }
 
     public void LoadMainMenu()
     {
         Debug.Log("Loading main menu");
+        IsLevelActive = false;
         SceneManager.LoadScene("MainMenu");
     }
 }

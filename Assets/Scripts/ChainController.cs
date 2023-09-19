@@ -13,7 +13,7 @@ public class ChainController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             IsFired = true;
         }

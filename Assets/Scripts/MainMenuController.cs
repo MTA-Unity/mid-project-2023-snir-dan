@@ -1,22 +1,35 @@
+using TMPro;
 using UnityEngine;
 
 public class MainMenuController : MonoBehaviour
 {
+    [SerializeField] private GameObject _highscorePanel;
+    [SerializeField] private TMP_Text _highscoreText;
+
+    void Start()
+    {
+        _highscorePanel.SetActive(false);
+    }
+
     public void OnPlayGameButtonClick()
     {
-        Debug.Log("PlayGame Clicked");
         GameManager.Instance.StartNewGame();
     }
 
     public void OnHighScoreButtonClick()
     {
-        Debug.Log("HighScore Clicked");
+        _highscorePanel.SetActive(true);
+        _highscoreText.text = GameManager.Instance.HighScore.ToString();
     }
     
     public void OnExitButtonClick()
     {
-        Debug.Log("Exit Clicked");
         GameManager.Instance.QuitGame();
     }
     
+    public void OnExitHighscoreButtonClick()
+    {
+        _highscorePanel.SetActive(false);
+    }
+
 }
